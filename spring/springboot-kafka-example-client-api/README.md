@@ -1,4 +1,4 @@
-# Spring Boot Kafka client API
+# Spring Boot Kafka example client API
 Example of Spring Boot Kafka client consist of Rest API that invoke Kafka request reply consumer. 
 
 ## How to use
