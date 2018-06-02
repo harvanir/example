@@ -5,7 +5,7 @@ Example of Spring Boot Kafka production code implementation.
 **1. Clone the application**
 
 ```bash
-git clone https://gitlab.com/harvan/example.git
+git clone https://github.com/harvanir/example.git
 ```
 
 **2. Download & install kafka**

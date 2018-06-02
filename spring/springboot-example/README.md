@@ -5,7 +5,7 @@ Example of Spring Boot production code implementation.
 **1. Clone the application**
 
 ```bash
-git clone https://gitlab.com/harvan/example.git
+git clone https://github.com/harvanir/example.git
 ```
 **2. Paste these files to local directory (example windows directory = D:/opt/boot/config)**
 1. /resources/opt/boot/config/application-se.properties
