@@ -37,13 +37,13 @@ D:\app\kafka_2.12-1.1.0>.\bin\windows\kafka-server-start.bat .\config\server.pro
 **6. Run the spring boot application**
 
 ```bash
-java -jar -Dserver.port=8082 target/springboot-kafka-example-client-api-0.0.1-SNAPSHOT-exec.jar
+java -jar -Dserver.port=8080 target/springboot-kafka-example-client-api-0.0.1-SNAPSHOT-exec.jar
 ```
 
 **7. Access the application via web browser (will handle by kafka consumer)**
 
 ```
-POST: http://localhost:8082/sum/{loop}
+POST: http://localhost:8080/sum/{loop}
 
 BODY:
 {
@@ -55,7 +55,7 @@ BODY:
 **8. Access the application via web browser (will handle by Rest API)**
 
 ```
-POST: http://localhost:8082/sum2/{loop}
+POST: http://localhost:8080/sum2/{loop}
 
 BODY:
 {
