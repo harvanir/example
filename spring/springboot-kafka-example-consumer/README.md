@@ -34,13 +34,20 @@ D:\app\kafka_2.12-1.1.0>.\bin\windows\zookeeper-server-start.bat .\config\zookee
 D:\app\kafka_2.12-1.1.0>.\bin\windows\kafka-server-start.bat .\config\server.properties
 ```
 
-**6. Run the spring boot application**
+**6. Configure kafka topic: request-topic**
+
+```bash
+D:\app\kafka_2.12-1.1.0>.\bin\windows\kafka-topics.bat -create --topic request-topic --replication-factor 1 --partitions 10 --zookeeper localhost:2181
+```
+
+**7. Run the spring boot application (multiple instance consumer)**
 
 ```bash
 java -jar -Dserver.port=8082 target/springboot-kafka-example-consumer-0.0.1-SNAPSHOT-exec.jar
+java -jar -Dserver.port=8083 target/springboot-kafka-example-consumer-0.0.1-SNAPSHOT-exec.jar
 ```
 
-**7. Access the application via kafka**
+**8. Access the application via kafka**
 
 ```
 Topic   = request-topic

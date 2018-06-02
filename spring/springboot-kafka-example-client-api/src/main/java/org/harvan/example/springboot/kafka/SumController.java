@@ -1,7 +1,13 @@
 package org.harvan.example.springboot.kafka;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -52,6 +58,7 @@ public class SumController {
 			throws InterruptedException, ExecutionException, IOException {
 		ConsumerRecord<String, String> consumerRecord = null;
 		int loop = Integer.parseInt(loopValue);
+		List<RequestReplyFuture<String, String, String>> listReply = new ArrayList<>(loop);
 
 		Long start = System.currentTimeMillis();
 		for (int i = 0; i < loop; i++) {
@@ -62,10 +69,16 @@ public class SumController {
 
 			// post in kafka topic
 			RequestReplyFuture<String, String, String> sendAndReceive = kafkaTemplate.sendAndReceive(record);
+			listReply.add(sendAndReceive);
+		}
 
+		System.out.println("Size: " + listReply.size());
+		for (int i = 0; i < listReply.size(); i++) {
+			RequestReplyFuture<String, String, String> sendAndReceive = listReply.get(i);
 			// get consumer record
 			consumerRecord = sendAndReceive.get();
 		}
+
 		Long end = System.currentTimeMillis();
 		System.out.println("Elapse in : " + (end - start) + " ms.");
 
@@ -88,19 +101,38 @@ public class SumController {
 	}
 
 	@PostMapping(value = "/sum2/{loop}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-	public Model sum2(@RequestBody String request, @PathVariable(name = "loop") String loopValue) throws IOException {
+	public Model sum2(@RequestBody String request, @PathVariable(name = "loop") String loopValue)
+			throws IOException, InterruptedException, ExecutionException {
 		ResponseEntity<String> temp = null;
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		int loop = Integer.parseInt(loopValue);
+		List<Future<ResponseEntity<String>>> listResponse = new ArrayList<>(loop);
+		int procCore = Runtime.getRuntime().availableProcessors() * 2;
+		ExecutorService executorService = Executors.newFixedThreadPool(procCore);
 
 		Long start = System.currentTimeMillis();
 		for (int i = 0; i < loop; i++) {
-			HttpEntity<String> entity = new HttpEntity<>(request, headers);
-			temp = restTemplate.postForEntity(getListen2Url(), entity, String.class);
+			Future<ResponseEntity<String>> future = executorService.submit(new Callable<ResponseEntity<String>>() {
+				@Override
+				public ResponseEntity<String> call() throws Exception {
+					HttpEntity<String> entity = new HttpEntity<>(request, headers);
+					return restTemplate.postForEntity(getListen2Url(), entity, String.class);
+				}
+			});
+
+			listResponse.add(future);
 		}
+
+		System.out.println("Size: " + listResponse.size());
+		for (int i = 0; i < listResponse.size(); i++) {
+			Future<ResponseEntity<String>> future = listResponse.get(i);
+			temp = future.get();
+		}
+
 		Long end = System.currentTimeMillis();
 		System.out.println("Elapse in : " + (end - start) + " ms.");
+		executorService.shutdown();
 
 		return mapper.readValue(temp.getBody(), Model.class);
 	}
