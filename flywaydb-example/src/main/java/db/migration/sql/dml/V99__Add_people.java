@@ -3,7 +3,7 @@ package db.migration.sql.dml;
 import java.sql.Connection;
 import java.sql.Statement;
 
-import org.rumusanframework.flywaydb.SelfMergeJdbcMigration;
+import org.rumusanframework.flywaydb.migration.jdbc.SelfMergeJdbcMigration;
 
 public class V99__Add_people extends SelfMergeJdbcMigration { // NOSONAR
 	private static final String VERSION = "'99'";

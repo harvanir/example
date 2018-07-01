@@ -2,7 +2,7 @@
  * Copyright 2018-2018 the original author or authors.
  */
 
-package org.rumusanframework.flywaydb;
+package org.rumusanframework.flywaydb.migration.jdbc;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
