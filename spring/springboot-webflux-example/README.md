@@ -1,5 +1,4 @@
 # Spring Boot webflux example
-Example of Spring Boot production code implementation. 
 
 ## How to use
 **1. Run the application**
