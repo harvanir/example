@@ -74,8 +74,8 @@ public class MainControllerTest {
 
     @Test
     public void testHome() {
-        when(mainEntityRepository.findAll()).thenReturn(findAll());
-        List<MainEntity> list = Arrays.asList(restTemplate.getForEntity("/webflux/", MainEntity[].class).getBody());
+        when(mainEntityRepository.findAllFlux()).thenReturn(findAll());
+        List<MainEntity> list = Arrays.asList(restTemplate.getForEntity("/webflux/reactive/all", MainEntity[].class).getBody());
 
         assertNotNull(list);
         assertEquals(4, list.size());
@@ -90,7 +90,7 @@ public class MainControllerTest {
         Mono<MainEntity> mainEntity = Mono.just(buildMainEntity(99));
         when(mainEntityRepository.findById(anyInt())).thenReturn(mainEntity);
 
-        Mono<MainEntity> response = Mono.just(restTemplate.getForEntity("/webflux/99", MainEntity.class).getBody());
+        Mono<MainEntity> response = Mono.just(restTemplate.getForEntity("/webflux/reactive/99", MainEntity.class).getBody());
 
         assertNotNull(response);
         assertEquals(mainEntity.block(), response.block());
