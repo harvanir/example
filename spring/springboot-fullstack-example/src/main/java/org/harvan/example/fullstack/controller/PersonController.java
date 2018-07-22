@@ -34,7 +34,7 @@ public class PersonController {
 
     @GetMapping("/")
     public Flux<PersonDtoResponse> findAll() {
-        return personService.findAll();
+        return personService.findAll().subscribeOn(Schedulers.elastic()).publishOn(Schedulers.elastic());
     }
 
 
@@ -52,6 +52,6 @@ public class PersonController {
 
     @GetMapping("/{id}")
     public Mono<PersonDtoResponse> findById(@PathVariable String id) {
-        return personService.findById(id);
+        return personService.findById(id).subscribeOn(Schedulers.elastic()).publishOn(Schedulers.elastic());
     }
 }
