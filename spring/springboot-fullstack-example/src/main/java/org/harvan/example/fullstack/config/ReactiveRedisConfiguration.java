@@ -16,7 +16,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 public class ReactiveRedisConfiguration {
     @Bean
-    public ReactiveRedisTemplate<String, Object> reactiveJsonObjectRedisTemplate(
+    public ReactiveRedisTemplate<String, Object> reactiveJsonObjectRedisOperations(
             ReactiveRedisConnectionFactory connectionFactory) {
 
         RedisSerializationContext.RedisSerializationContextBuilder<String, Object> builder = RedisSerializationContext

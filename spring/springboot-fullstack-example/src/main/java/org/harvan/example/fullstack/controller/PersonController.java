@@ -32,7 +32,7 @@ public class PersonController {
         return Mono.just("pinged...");
     }
 
-    @GetMapping("/")
+    @GetMapping()
     public Flux<PersonDtoResponse> findAll() {
         return personService.findAll().subscribeOn(Schedulers.elastic()).publishOn(Schedulers.elastic());
     }
