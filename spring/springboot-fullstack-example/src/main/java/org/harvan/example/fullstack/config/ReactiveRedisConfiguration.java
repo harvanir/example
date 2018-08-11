@@ -2,11 +2,14 @@ package org.harvan.example.fullstack.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import java.util.Objects;
 
 /**
  * @author Harvan Irsyadi
@@ -15,16 +18,19 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
  */
 @Configuration
 public class ReactiveRedisConfiguration {
+
     @Bean
-    public ReactiveRedisTemplate<String, Object> reactiveJsonObjectRedisOperations(
-            ReactiveRedisConnectionFactory connectionFactory) {
+    public ReactiveRedisTemplate<String, Object> reactiveRedisTemplate(
+            ReactiveRedisConnectionFactory reactiveRedisConnectionFactory,
+            ResourceLoader resourceLoader) {
+        JdkSerializationRedisSerializer jdkSerializer = new JdkSerializationRedisSerializer(
+                Objects.requireNonNull(resourceLoader.getClassLoader()));
 
-        RedisSerializationContext.RedisSerializationContextBuilder<String, Object> builder = RedisSerializationContext
-                .newSerializationContext(new StringRedisSerializer());
+        RedisSerializationContext<String, Object> serializationContext = RedisSerializationContext
+                .<String, Object>newSerializationContext().key(new StringRedisSerializer()).value(jdkSerializer)
+                .hashKey(jdkSerializer).hashValue(jdkSerializer).build();
 
-        RedisSerializationContext<String, Object> serializationContext = builder
-                .value(new GenericJackson2JsonRedisSerializer("_type")).build();
-
-        return new ReactiveRedisTemplate<>(connectionFactory, serializationContext);
+        return new ReactiveRedisTemplate<>(reactiveRedisConnectionFactory,
+                serializationContext);
     }
 }

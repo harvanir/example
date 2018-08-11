@@ -11,6 +11,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
-public @interface CustomCacheables {
-    String value() default "";
+public @interface CustomCacheable {
+    String key() default "";
 }

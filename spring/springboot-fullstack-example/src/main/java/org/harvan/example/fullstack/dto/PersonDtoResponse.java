@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -13,7 +14,7 @@ import java.util.Date;
  */
 @Getter
 @Setter
-public class PersonDtoResponse {
+public class PersonDtoResponse implements Serializable {
     @JsonProperty("id")
     private Long id;
     @JsonProperty("name")

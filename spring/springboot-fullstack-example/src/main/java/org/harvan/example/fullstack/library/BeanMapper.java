@@ -4,7 +4,6 @@ import org.harvan.example.fullstack.dto.PersonDtoRequest;
 import org.harvan.example.fullstack.dto.PersonDtoResponse;
 import org.harvan.example.fullstack.entity.Person;
 import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
 
 /**
  * @author Harvan Irsyadi
@@ -13,7 +12,6 @@ import org.mapstruct.factory.Mappers;
  */
 @Mapper
 public interface BeanMapper {
-    BeanMapper INSTANCE = Mappers.getMapper(BeanMapper.class);
 
     Person map(PersonDtoRequest personDtoRequest);
 

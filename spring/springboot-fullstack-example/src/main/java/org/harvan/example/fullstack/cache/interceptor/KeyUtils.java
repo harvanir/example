@@ -1,4 +1,4 @@
-package org.harvan.example.fullstack.cache.producer.impl;
+package org.harvan.example.fullstack.cache.interceptor;
 
 /**
  * @author Harvan Irsyadi
@@ -6,6 +6,9 @@ package org.harvan.example.fullstack.cache.producer.impl;
  * @since 1.0.0
  */
 public class KeyUtils {
+    private KeyUtils() {
+        //hide
+    }
 
     public static String getKey(String prefix, Object... id) {
         StringBuilder sb = new StringBuilder();

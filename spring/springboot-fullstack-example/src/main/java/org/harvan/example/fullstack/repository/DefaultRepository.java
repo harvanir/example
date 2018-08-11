@@ -12,9 +12,9 @@ import java.util.Optional;
  * @since 1.0.0 (23 Jul 2018)
  */
 @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-public interface DefaultRepository<T, ID> extends CrudRepository<T, ID> {
+public interface DefaultRepository<T, K> extends CrudRepository<T, K> {
     @Override
-    Optional<T> findById(ID aLong);
+    Optional<T> findById(K aLong);
 
     @Override
     Iterable<T> findAll();
