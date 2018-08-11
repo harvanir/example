@@ -28,14 +28,14 @@ public class CacheAspect {
     }
 
     @Around("@annotation(customCacheable)")
-    public Object around(ProceedingJoinPoint proceedingJoinPoint, CustomCacheable customCacheable) throws IllegalAccessException {
+    public Object around(ProceedingJoinPoint proceedingJoinPoint, CustomCacheable customCacheable) {
         Method method = ((MethodSignature) proceedingJoinPoint.getSignature()).getMethod();
 
         return cacheDelegator.delegate(customCacheable, proceedingJoinPoint.getTarget(), method, proceedingJoinPoint.getArgs());
     }
 
     @Around("@annotation(customEvict)")
-    public Object around(ProceedingJoinPoint proceedingJoinPoint, CustomEvict customEvict) throws IllegalAccessException {
+    public Object around(ProceedingJoinPoint proceedingJoinPoint, CustomEvict customEvict) {
         Method method = ((MethodSignature) proceedingJoinPoint.getSignature()).getMethod();
 
         return cacheDelegator.delegate(customEvict, proceedingJoinPoint.getTarget(), method, proceedingJoinPoint.getArgs());
