@@ -8,6 +8,7 @@ import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.function.Supplier;
 
 import static reactor.core.scheduler.Schedulers.elastic;
@@ -37,9 +38,9 @@ public class FluxCacheInterceptor extends ReactorCacheInterceptor<Flux<Object>> 
                 logger.debug("Read from redis, key: {}", parsedKey);
             }
 
-            return connection.stringCommands().get(ByteBuffer.wrap(parsedKey.getBytes())).flux();
-        }).subscribeOn(elastic()).publishOn(elastic()).map(
-                byteBuffer -> reactiveRedisTemplate.getSerializationContext().getValueSerializationPair()
+            return connection.stringCommands().get(ByteBuffer.wrap(parsedKey.getBytes()));
+        }).subscribeOn(elastic()).publishOn(elastic()).flatMapIterable(
+                byteBuffer -> (List<Object>) reactiveRedisTemplate.getSerializationContext().getValueSerializationPair()
                         .read(byteBuffer)
         ).switchIfEmpty(Flux.defer(() ->
                 put(key, supplier, args)
@@ -52,7 +53,7 @@ public class FluxCacheInterceptor extends ReactorCacheInterceptor<Flux<Object>> 
                 ).map(aBoolean ->
                         emitter
                 )
-        ).flux().flatMap(Flux::fromIterable);
+        ).flatMapMany(Flux::fromIterable);
     }
 
     @Override
