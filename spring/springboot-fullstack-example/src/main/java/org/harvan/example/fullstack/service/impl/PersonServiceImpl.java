@@ -17,8 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Optional;
-
 /**
  * @author Harvan Irsyadi
  * @version 1.0.0
@@ -70,12 +68,19 @@ public class PersonServiceImpl implements PersonService {
     }
 
     private Mono<PersonDtoResponse> findByIdValue(String id) {
-        Optional<Person> person = personRepository.findById(Long.valueOf(id));
+        return personRepository.findById(Long.valueOf(id))
+                .map(person -> Mono.just(mapper.map(person)))
+                .orElseGet(Mono::empty);
+    }
 
-        if (person.isPresent()) {
-            return Mono.just(mapper.map(person.get()));
-        } else {
-            return Mono.empty();
-        }
+    @Override
+    public Mono<PersonDtoResponse> findByName(String name) {
+        return personRepository.findByName(name
+        ).map(person -> {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Logging service...");
+            }
+            return mapper.map(person);
+        });
     }
 }

@@ -16,4 +16,6 @@ public interface PersonService {
     Mono<PersonDtoResponse> save(PersonDtoRequest personDtoRequest);
 
     Mono<PersonDtoResponse> findById(String id);
+
+    Mono<PersonDtoResponse> findByName(String name);
 }

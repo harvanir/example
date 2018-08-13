@@ -9,7 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
+
+import static reactor.core.scheduler.Schedulers.elastic;
 
 /**
  * @author Harvan Irsyadi
@@ -34,24 +35,35 @@ public class PersonController {
 
     @GetMapping()
     public Flux<PersonDtoResponse> findAll() {
-        return personService.findAll().subscribeOn(Schedulers.elastic()).publishOn(Schedulers.elastic());
+        return personService.findAll().subscribeOn(elastic()).publishOn(elastic());
     }
 
 
     @PostMapping("/")
     public Mono<PersonDtoResponse> create(@RequestBody PersonDtoRequest personDtoRequest) {
-        return personService.save(personDtoRequest).map(emitter -> {
+        return personService.save(personDtoRequest).map(dto -> {
             if (logger.isDebugEnabled()) {
                 logger.debug("personDtoRequest: {}", personDtoRequest);
-                logger.debug("returned save: {}", emitter);
+                logger.debug("returned save: {}", dto);
             }
 
-            return emitter;
-        }).subscribeOn(Schedulers.elastic()).publishOn(Schedulers.elastic());
+            return dto;
+        }).subscribeOn(elastic()).publishOn(elastic());
     }
 
     @GetMapping("/{id}")
     public Mono<PersonDtoResponse> findById(@PathVariable String id) {
-        return personService.findById(id).subscribeOn(Schedulers.elastic()).publishOn(Schedulers.elastic());
+        return personService.findById(id).subscribeOn(elastic()).publishOn(elastic());
+    }
+
+    @GetMapping("/findByName/{name}")
+    public Mono<PersonDtoResponse> findByName(@PathVariable String name) {
+        return Mono.defer(() -> {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Logging controller...");
+            }
+
+            return personService.findByName(name);
+        }).subscribeOn(elastic()).publishOn(elastic());
     }
 }
