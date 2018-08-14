@@ -8,6 +8,7 @@ import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
+import java.time.Duration;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -29,8 +30,7 @@ public class FluxCacheInterceptor extends ReactorCacheInterceptor<Flux<Object>> 
         return Flux.class.isAssignableFrom(method.getReturnType());
     }
 
-    @Override
-    public Flux<Object> getCache(Supplier<Flux<Object>> supplier, String key, Object... args) {
+    private Flux<Object> getCache(String key, Object... args) {
         return Flux.defer(() -> reactiveRedisTemplate.execute(connection -> {
             String parsedKey = getKey(key, args);
 
@@ -40,16 +40,37 @@ public class FluxCacheInterceptor extends ReactorCacheInterceptor<Flux<Object>> 
 
             return connection.stringCommands().get(ByteBuffer.wrap(parsedKey.getBytes()));
         }).subscribeOn(elastic()).publishOn(elastic()).flatMapIterable(
-                byteBuffer -> (List<Object>) reactiveRedisTemplate.getSerializationContext().getValueSerializationPair()
+                byteBuffer -> (List<?>) reactiveRedisTemplate.getSerializationContext().getValueSerializationPair()
                         .read(byteBuffer)
-        ).switchIfEmpty(Flux.defer(() ->
-                put(key, supplier, args)
-        )));
+        ));
     }
 
-    private Flux<Object> put(String key, Supplier<Flux<Object>> supplier, Object... args) {
+    @Override
+    public Flux<Object> getCache(Supplier<Flux<Object>> supplier, String key, Object... args) {
+        return getCache(key, args).switchIfEmpty(Flux.defer(() ->
+                put(supplier, key, args)
+        ));
+    }
+
+    private Flux<Object> put(Supplier<Flux<Object>> supplier, String key, Object... args) {
         return supplier.get().collectList().flatMap(emitter ->
                 reactiveRedisTemplate.opsForValue().set(getKey(key, args), emitter
+                ).map(aBoolean ->
+                        emitter
+                )
+        ).flatMapMany(Flux::fromIterable);
+    }
+
+    @Override
+    public Flux<Object> getCache(Supplier<Flux<Object>> supplier, String key, Duration timeout, Object... args) {
+        return getCache(key, args).switchIfEmpty(Flux.defer(() ->
+                put(supplier, key, timeout, args)
+        ));
+    }
+
+    private Flux<Object> put(Supplier<Flux<Object>> supplier, String key, Duration timeout, Object... args) {
+        return supplier.get().collectList().flatMap(emitter ->
+                reactiveRedisTemplate.opsForValue().set(getKey(key, args), emitter, timeout
                 ).map(aBoolean ->
                         emitter
                 )

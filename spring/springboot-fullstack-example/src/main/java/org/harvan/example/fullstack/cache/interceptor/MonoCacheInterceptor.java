@@ -7,6 +7,7 @@ import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
+import java.time.Duration;
 import java.util.function.Supplier;
 
 import static reactor.core.scheduler.Schedulers.elastic;
@@ -17,6 +18,7 @@ import static reactor.core.scheduler.Schedulers.elastic;
  * @since 1.0.0 (30 Jul 2018)
  */
 public class MonoCacheInterceptor extends ReactorCacheInterceptor<Mono<Object>> {
+
     private Logger logger = LogManager.getLogger(getClass());
 
     public MonoCacheInterceptor(ReactiveRedisTemplate<String, Object> reactiveRedisTemplate) {
@@ -27,8 +29,7 @@ public class MonoCacheInterceptor extends ReactorCacheInterceptor<Mono<Object>> 
         return Mono.class.isAssignableFrom(method.getReturnType());
     }
 
-    @Override
-    public Mono<Object> getCache(Supplier<Mono<Object>> supplier, String key, Object... args) {
+    public Mono<Object> getCache(String key, Object... args) {
         return Mono.defer(() -> reactiveRedisTemplate.execute(connection -> {
             String parsedKey = getKey(key, args);
 
@@ -40,22 +41,46 @@ public class MonoCacheInterceptor extends ReactorCacheInterceptor<Mono<Object>> 
         }).subscribeOn(elastic()).publishOn(elastic()).next().map(
                 byteBuffer -> reactiveRedisTemplate.getSerializationContext().getValueSerializationPair()
                         .read(byteBuffer)
-        ).switchIfEmpty(Mono.defer(() ->
-                put(key, supplier, args)
-        )));
+        ));
     }
 
-    private Mono<Object> put(String value, Supplier<Mono<Object>> supplier, Object... args) {
-        return supplier.get().flatMap(emitter ->
-                reactiveRedisTemplate.opsForValue().set(getKey(value, args), emitter
+    @Override
+    public Mono<Object> getCache(Supplier<Mono<Object>> supplier, String key, Object... args) {
+        return getCache(key, args
+        ).switchIfEmpty(Mono.defer(() ->
+                put(supplier, key, args)
+        ));
+    }
+
+    private Mono<Object> put(Supplier<Mono<Object>> supplier, String key, Object... args) {
+        return supplier.get().flatMap(value ->
+                reactiveRedisTemplate.opsForValue().set(getKey(key, args), value
                 ).map(aBoolean ->
-                        emitter
+                        value
+                )
+        );
+    }
+
+    @Override
+    public Mono<Object> getCache(Supplier<Mono<Object>> supplier, String key, Duration timeout, Object... args) {
+        return getCache(key, args
+        ).switchIfEmpty(Mono.defer(() ->
+                put(supplier, key, timeout, args)
+        ));
+    }
+
+    private Mono<Object> put(Supplier<Mono<Object>> supplier, String key, Duration timeout, Object... args) {
+        return supplier.get().flatMap(value ->
+                reactiveRedisTemplate.opsForValue().set(getKey(key, args), value, timeout
+                ).map(aBoolean ->
+                        value
                 )
         );
     }
 
     @Override
     public Mono<Boolean> evict(String value, Object... args) {
-        return reactiveRedisTemplate.opsForValue().delete(getKey(value, args)).subscribeOn(elastic()).publishOn(elastic());
+        return reactiveRedisTemplate.opsForValue().delete(getKey(value, args)).subscribeOn(elastic())
+                .publishOn(elastic());
     }
 }
