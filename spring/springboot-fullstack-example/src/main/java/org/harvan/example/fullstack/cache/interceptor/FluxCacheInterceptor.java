@@ -3,6 +3,7 @@ package org.harvan.example.fullstack.cache.interceptor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
+import org.springframework.data.redis.serializer.SerializationException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -30,6 +31,7 @@ public class FluxCacheInterceptor extends ReactorCacheInterceptor<Flux<Object>> 
         return Flux.class.isAssignableFrom(method.getReturnType());
     }
 
+    @SuppressWarnings("unchecked")
     private Flux<Object> getCache(String key, Object... args) {
         return Flux.defer(() -> reactiveRedisTemplate.execute(connection -> {
             String parsedKey = getKey(key, args);
@@ -40,14 +42,20 @@ public class FluxCacheInterceptor extends ReactorCacheInterceptor<Flux<Object>> 
 
             return connection.stringCommands().get(ByteBuffer.wrap(parsedKey.getBytes()));
         }).subscribeOn(elastic()).publishOn(elastic()).flatMapIterable(
-                byteBuffer -> (List<?>) reactiveRedisTemplate.getSerializationContext().getValueSerializationPair()
+                byteBuffer -> (List<Object>) reactiveRedisTemplate.getSerializationContext().getValueSerializationPair()
                         .read(byteBuffer)
-        ));
+        )).onErrorResume(throwable -> {
+            if (throwable instanceof SerializationException) {
+                return Flux.empty();
+            }
+            return Flux.error(throwable);
+        });
     }
 
     @Override
     public Flux<Object> getCache(Supplier<Flux<Object>> supplier, String key, Object... args) {
-        return getCache(key, args).switchIfEmpty(Flux.defer(() ->
+        return getCache(key, args
+        ).switchIfEmpty(Flux.defer(() ->
                 put(supplier, key, args)
         ));
     }

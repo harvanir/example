@@ -3,6 +3,7 @@ package org.harvan.example.fullstack.cache.interceptor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
+import org.springframework.data.redis.serializer.SerializationException;
 import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Method;
@@ -18,7 +19,6 @@ import static reactor.core.scheduler.Schedulers.elastic;
  * @since 1.0.0 (30 Jul 2018)
  */
 public class MonoCacheInterceptor extends ReactorCacheInterceptor<Mono<Object>> {
-
     private Logger logger = LogManager.getLogger(getClass());
 
     public MonoCacheInterceptor(ReactiveRedisTemplate<String, Object> reactiveRedisTemplate) {
@@ -29,7 +29,7 @@ public class MonoCacheInterceptor extends ReactorCacheInterceptor<Mono<Object>> 
         return Mono.class.isAssignableFrom(method.getReturnType());
     }
 
-    public Mono<Object> getCache(String key, Object... args) {
+    private Mono<Object> getCache(String key, Object... args) {
         return Mono.defer(() -> reactiveRedisTemplate.execute(connection -> {
             String parsedKey = getKey(key, args);
 
@@ -41,7 +41,12 @@ public class MonoCacheInterceptor extends ReactorCacheInterceptor<Mono<Object>> 
         }).subscribeOn(elastic()).publishOn(elastic()).next().map(
                 byteBuffer -> reactiveRedisTemplate.getSerializationContext().getValueSerializationPair()
                         .read(byteBuffer)
-        ));
+        )).onErrorResume(throwable -> {
+            if (throwable instanceof SerializationException) {
+                return Mono.empty();
+            }
+            return Mono.error(throwable);
+        });
     }
 
     @Override
