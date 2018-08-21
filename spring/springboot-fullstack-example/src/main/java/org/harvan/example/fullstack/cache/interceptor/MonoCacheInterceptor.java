@@ -18,7 +18,7 @@ import static reactor.core.scheduler.Schedulers.elastic;
  * @version 1.0.0
  * @since 1.0.0 (30 Jul 2018)
  */
-public class MonoCacheInterceptor extends ReactorCacheInterceptor<Mono<Object>> {
+public class MonoCacheInterceptor extends ReactorCacheInterceptor<Mono<Object>, Mono<Boolean>> {
     private Logger logger = LogManager.getLogger(getClass());
 
     public MonoCacheInterceptor(ReactiveRedisTemplate<String, Object> reactiveRedisTemplate) {

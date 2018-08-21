@@ -18,19 +18,23 @@ import java.util.List;
  * @since 1.0.0 (30 Jul 2018)
  */
 public class ReactorCacheDelegator implements CacheDelegator, InitializingBean {
-    private static final List<CacheInterceptor<?>> CACHE_INTERCEPTORS = new ArrayList<>();
-    private CacheInterceptor<Mono<Object>> monoCacheInterceptor;
-    private CacheInterceptor<Flux<Object>> fluxCacheInterceptor;
+    private static final List<CacheInterceptor<?, Mono<Boolean>>> CACHE_INTERCEPTORS = new ArrayList<>();
+    private CacheInterceptor<Mono<Object>, Mono<Boolean>> monoCacheInterceptor;
+    private CacheInterceptor<Flux<Object>, Mono<Boolean>> fluxCacheInterceptor;
 
-    public ReactorCacheDelegator(CacheInterceptor<Mono<Object>> monoCacheInterceptor, CacheInterceptor<Flux<Object>> fluxCacheInterceptor) {
+    public ReactorCacheDelegator(
+            CacheInterceptor<Mono<Object>, Mono<Boolean>> monoCacheInterceptor,
+            CacheInterceptor<Flux<Object>, Mono<Boolean>> fluxCacheInterceptor
+    ) {
         this.monoCacheInterceptor = monoCacheInterceptor;
         this.fluxCacheInterceptor = fluxCacheInterceptor;
     }
 
-    private CacheInterceptor<Object> getInterceptor(Method method) {
-        for (CacheInterceptor<?> cacheInterceptor : CACHE_INTERCEPTORS) {
+    @SuppressWarnings("unchecked")
+    private CacheInterceptor<Object, Mono<Boolean>> getInterceptor(Method method) {
+        for (CacheInterceptor<?, ?> cacheInterceptor : CACHE_INTERCEPTORS) {
             if (cacheInterceptor.isResponsible(method)) {
-                return (CacheInterceptor<Object>) cacheInterceptor;
+                return (CacheInterceptor<Object, Mono<Boolean>>) cacheInterceptor;
             }
         }
 
@@ -39,7 +43,7 @@ public class ReactorCacheDelegator implements CacheDelegator, InitializingBean {
 
     @Override
     public Object delegate(Annotation annotation, Object realObject, Method method, Object... args) {
-        CacheInterceptor<Object> cacheInterceptor = getInterceptor(method);
+        CacheInterceptor<Object, Mono<Boolean>> cacheInterceptor = getInterceptor(method);
 
         if (annotation instanceof CustomCacheable) {
             return cacheInterceptor.getCache(

@@ -20,7 +20,7 @@ import static reactor.core.scheduler.Schedulers.elastic;
  * @version 1.0.0
  * @since 1.0.0 (12 Aug 2018)
  */
-public class FluxCacheInterceptor extends ReactorCacheInterceptor<Flux<Object>> {
+public class FluxCacheInterceptor extends ReactorCacheInterceptor<Flux<Object>, Mono<Boolean>> {
     private Logger logger = LogManager.getLogger(getClass());
 
     public FluxCacheInterceptor(ReactiveRedisTemplate<String, Object> reactiveRedisTemplate) {

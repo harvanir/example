@@ -16,18 +16,20 @@ import reactor.core.publisher.Mono;
 public class CacheConfiguration {
 
     @Bean
-    public CacheInterceptor<Mono<Object>> monoCacheInterceptor(ReactiveRedisTemplate<String, Object> reactiveRedisTemplate) {
+    public CacheInterceptor<Mono<Object>, Mono<Boolean>> monoCacheInterceptor(ReactiveRedisTemplate<String, Object> reactiveRedisTemplate) {
         return new MonoCacheInterceptor(reactiveRedisTemplate);
     }
 
     @Bean
-    public CacheInterceptor<Flux<Object>> fluxCacheInterceptor(ReactiveRedisTemplate<String, Object> reactiveRedisTemplate) {
+    public CacheInterceptor<Flux<Object>, Mono<Boolean>> fluxCacheInterceptor(ReactiveRedisTemplate<String, Object> reactiveRedisTemplate) {
         return new FluxCacheInterceptor(reactiveRedisTemplate);
     }
 
     @Bean
-    public CacheDelegator reactorCacheDelegator(CacheInterceptor<Mono<Object>> monoCacheInterceptor
-            , CacheInterceptor<Flux<Object>> fluxCacheInterceptor) {
+    public CacheDelegator reactorCacheDelegator(
+            CacheInterceptor<Mono<Object>, Mono<Boolean>> monoCacheInterceptor
+            , CacheInterceptor<Flux<Object>, Mono<Boolean>> fluxCacheInterceptor
+    ) {
         return new ReactorCacheDelegator(monoCacheInterceptor, fluxCacheInterceptor);
     }
 

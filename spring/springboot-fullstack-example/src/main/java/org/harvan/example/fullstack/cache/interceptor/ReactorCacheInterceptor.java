@@ -7,7 +7,7 @@ import org.springframework.data.redis.core.ReactiveRedisTemplate;
  * @version 1.0.0
  * @since 1.0.0 (30 Jul 2018)
  */
-abstract class ReactorCacheInterceptor<T> implements AbstractCacheInterceptor<T> {
+abstract class ReactorCacheInterceptor<T, E> implements AbstractCacheInterceptor<T, E> {
     ReactiveRedisTemplate<String, Object> reactiveRedisTemplate;
 
     ReactorCacheInterceptor(ReactiveRedisTemplate<String, Object> reactiveRedisTemplate) {
