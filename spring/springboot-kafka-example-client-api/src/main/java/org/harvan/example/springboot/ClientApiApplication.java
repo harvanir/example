@@ -8,7 +8,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * 
+ *
  * @author Harvan Irsyadi
  * @version 1.0.0
  * @since 1.0.0 (6 May 2018)
