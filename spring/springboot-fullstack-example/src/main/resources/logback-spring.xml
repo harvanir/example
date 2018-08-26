@@ -3,7 +3,7 @@
 
     <appender class="ch.qos.logback.core.ConsoleAppender" name="STDOUT">
         <encoder>
-            <pattern>%date{YYYY/MM/dd HH:mm:ss:SSS} [%thread] %level [%logger{10}:%line] : %msg%n</pattern>
+            <pattern>[%date{YYYY/MM/dd HH:mm:ss:SSS}] [%thread] [%level] [%logger{10}:%line] : %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -18,7 +18,7 @@
             </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
         <encoder>
-            <pattern>%date{YYYY/MM/dd HH:mm:ss:SSS} [%thread] %level [%logger{10}:%line] : %msg%n</pattern>
+            <pattern>[%date{YYYY/MM/dd HH:mm:ss:SSS}] [%thread] [%level] [%logger{10}:%line] : %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -33,7 +33,7 @@
             </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
         <encoder>
-            <pattern>%date{YYYY/MM/dd HH:mm:ss:SSS} [%thread] %level [%logger{10}:%line] : %msg%n</pattern>
+            <pattern>[%date{YYYY/MM/dd HH:mm:ss:SSS}] [%thread] [%level] [%logger{10}:%line] : %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -48,7 +48,7 @@
             </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
         <encoder>
-            <pattern>%date{YYYY/MM/dd HH:mm:ss:SSS} [%thread] %level [%logger{10}:%line] : %msg%n</pattern>
+            <pattern>[%date{YYYY/MM/dd HH:mm:ss:SSS}] [%thread] [%level] [%logger{10}:%line] : %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -63,7 +63,7 @@
             </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
         <encoder>
-            <pattern>%date{YYYY/MM/dd HH:mm:ss:SSS} [%thread] %level [%logger{10}:%line] : %msg%n</pattern>
+            <pattern>[%date{YYYY/MM/dd HH:mm:ss:SSS}] [%thread] [%level] [%logger{10}:%line] : %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -78,7 +78,7 @@
             </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
         <encoder>
-            <pattern>%date{YYYY/MM/dd HH:mm:ss:SSS} [%thread] %level [%logger{10}:%line] : %msg%n</pattern>
+            <pattern>[%date{YYYY/MM/dd HH:mm:ss:SSS}] [%thread] [%level] [%logger{10}:%line] : %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -93,7 +93,7 @@
             </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
         <encoder>
-            <pattern>%date{YYYY/MM/dd HH:mm:ss:SSS} [%thread] %level [%logger{10}:%line] : %msg%n</pattern>
+            <pattern>[%date{YYYY/MM/dd HH:mm:ss:SSS}] [%thread] [%level] [%logger{10}:%line] : %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -113,7 +113,7 @@
         <appender-ref ref="COM"/>
     </logger>
 
-    <logger additivity="false" level="INFO" name="org.hibernate">
+    <logger additivity="false" level="DEBUG" name="org.hibernate">
         <appender-ref ref="HIBERNATE"/>
     </logger>
 
