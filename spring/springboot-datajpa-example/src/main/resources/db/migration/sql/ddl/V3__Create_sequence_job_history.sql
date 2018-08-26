@@ -1,1 +1,0 @@
-CREATE SEQUENCE job_history_seq;
